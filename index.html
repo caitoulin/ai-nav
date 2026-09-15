@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 信号台 · AI 工具导航与状态监控</title>
+<meta name="description" content="精选 AI 工具导航 + 实时状态信号：模型发布、额度重置、榜单基准、热点资讯，一站收齐。">
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#fff; --ink:#151a21; --ink2:#5a6673; --ink3:#8b95a1;
+    --line:#e5e8ec; --brand:#2563eb; --brand-soft:#eef3ff; --hot:#e8590c; --hot-soft:#fff3e8;
+    --sig:#0d9488; --sig-soft:#e6f7f5; --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
+    --radius:12px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#0e1116; --card:#161b22; --ink:#e7edf3; --ink2:#9aa7b4; --ink3:#6e7b88;
+           --line:#242c36; --brand:#5b8def; --brand-soft:#17233a; --hot:#ff8f4d; --hot-soft:#33200f;
+           --sig:#2dd4bf; --sig-soft:#0f2e2b; --shadow:none; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+
+  header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .hbar{display:flex;align-items:center;gap:14px;padding:12px 0}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:16px;white-space:nowrap}
+  .logo i{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--sig));display:block}
+  .logo small{font-weight:400;color:var(--ink3);font-size:12px}
+  .search{flex:1;position:relative;min-width:120px}
+  .search input{width:100%;padding:9px 34px 9px 34px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:14px;outline:none}
+  .search input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .search .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:13px}
+  .search kbd{position:absolute;right:9px;top:50%;transform:translateY(-50%);font:11px/1.6 ui-monospace,monospace;color:var(--ink3);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+
+  .cats{display:flex;gap:7px;overflow-x:auto;padding:0 0 11px;scrollbar-width:none}
+  .cats::-webkit-scrollbar{display:none}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:5px 12px;border-radius:999px;font-size:13px;white-space:nowrap;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--brand);color:var(--brand)}
+  .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .chip.hot.on{background:var(--hot);border-color:var(--hot)}
+
+  .lead{padding:22px 0 8px}
+  .lead h1{margin:0 0 6px;font-size:23px;letter-spacing:-.3px}
+  .lead p{margin:0;color:var(--ink3);font-size:13px}
+
+  .sect{margin:26px 0 8px;display:flex;align-items:baseline;gap:9px}
+  .sect h2{margin:0;font-size:16px}
+  .sect span{color:var(--ink3);font-size:12.5px}
+  .sect.signal h2{color:var(--sig)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:10px;margin-bottom:8px}
+  .card{display:flex;gap:11px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px;box-shadow:var(--shadow);transition:.15s;position:relative}
+  .card:hover{transform:translateY(-2px);border-color:var(--brand)}
+  .card.is-signal:hover{border-color:var(--sig)}
+  .av{flex:none;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff}
+  .meta{min-width:0;flex:1}
+  .nm{display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px}
+  .nm b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tagline{font-size:10.5px;padding:1px 6px;border-radius:5px;font-weight:400;flex:none}
+  .tagline.hot{background:var(--hot-soft);color:var(--hot)}
+  .tagline.sig{background:var(--sig-soft);color:var(--sig)}
+  .tagline.nav{background:var(--brand-soft);color:var(--brand)}
+  .du{color:var(--ink3);font-size:12px;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+  .cp{position:absolute;right:8px;bottom:8px;font-size:11px;color:var(--ink3);border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:1px 6px;opacity:0;transition:.15s;cursor:pointer}
+  .card:hover .cp{opacity:1}
+  .empty{padding:56px 0;text-align:center;color:var(--ink3)}
+
+  footer{margin:46px 0 34px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink3);font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#151a21;color:#fff;padding:8px 15px;border-radius:9px;font-size:13px;opacity:0;pointer-events:none;transition:.22s;z-index:50}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  @media (max-width:560px){ .lead h1{font-size:20px} .grid{grid-template-columns:1fr} .logo small{display:none} }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="hbar">
+      <div class="logo"><i></i><span>AI 信号台<small>　导航 + 状态</small></span></div>
+      <div class="search">
+        <span class="ico">⌕</span>
+        <input id="q" type="search" placeholder="搜索站点、用途或关键词…" autocomplete="off">
+        <kbd>/</kbd>
+      </div>
+    </div>
+    <div class="cats" id="cats"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="lead">
+    <h1>AI 工具导航与实时信号</h1>
+    <p id="count"></p>
+  </div>
+  <div id="out"></div>
+</main>
+
+<footer class="wrap">
+  <span>收录 <b id="total"></b> 个站点 · 全部链接经连通性核验</span>
+  <span>静态站点，无追踪 · 点击卡片右上「复制」可拷贝链接</span>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const CATS = [
+  ["signal","状态与信号","实时追踪：额度重置 / 模型发布 / 服务状态","#0d9488"],
+  ["chat","对话与模型","通用大模型与对话产品","#2563eb"],
+  ["code","AI 编程","编码助手、IDE 与代码生成","#7c3aed"],
+  ["image","图像生成","文生图、改图、设计稿","#db2777"],
+  ["video","视频生成","文生视频、数字人、动效","#ea580c"],
+  ["audio","音频与音乐","语音合成、音乐生成、转录","#0891b2"],
+  ["agent","Agent 与开发","智能体框架、编排、运行沙箱","#4f46e5"],
+  ["research","检索与研究","深度检索、文献问答、报告","#059669"],
+  ["paper","学术与论文","预印本、论文库、引用网络","#65a30d"],
+  ["rank","榜单与基准","模型排行、评测基准、价格对比","#ca8a04"],
+  ["news","资讯与热点","行业媒体、日报、博客","#dc2626"],
+  ["tool","工具与资源","模型托管、本地部署、MCP、提示词","#475569"],
+  ["local","国内与中文","国内可直接访问的产品与社区","#e11d48"],
+  ["nav","同类导航","其他 AI 导航与聚合站","#64748b"]
+];
+
+const SITES = [
+/* ── 状态与信号 ───────────────────────────── */
+{n:"Codex 重置追踪",u:"https://codex-reset.com/zh/",d:"追踪 Codex 额度重置时间，含实时预测",c:"signal",hot:1},
+{n:"Codex 雷达",u:"https://codex-reset.com/zh/radar",d:"重置、额度与模型信号汇总",c:"signal"},
+{n:"AI 服务重置监控",u:"https://www.aitrend.us/codex-reset",d:"多家 AI 服务的重置时间监控",c:"signal"},
+{n:"AI 热点榜",u:"https://aihot.news/hot",d:"卡兹克团队的 AI 热点监控榜",c:"signal",hot:1},
+{n:"AI 日报",u:"https://aihot.news/daily",d:"AI 领域每日要点汇总",c:"signal"},
+{n:"OpenAI 状态页",u:"https://status.openai.com",d:"ChatGPT / API 服务状态与故障公告",c:"signal"},
+{n:"Anthropic 状态页",u:"https://status.anthropic.com",d:"Claude 服务状态",c:"signal"},
+{n:"Google Cloud 状态",u:"https://status.cloud.google.com",d:"含 Vertex / Gemini 的状态页",c:"signal"},
+{n:"OpenRouter 排行",u:"https://openrouter.ai/rankings",d:"按真实调用量排的模型榜",c:"signal",hot:1},
+{n:"HuggingFace 趋势",u:"https://huggingface.co/models",d:"模型下载与热度榜",c:"signal"},
+{n:"HuggingFace 论文",u:"https://huggingface.co/papers",d:"每日热门论文榜",c:"signal",hot:1},
+{n:"GitHub Trending",u:"https://github.com/trending",d:"今日热门仓库，AI 项目常驻",c:"signal"},
+
+/* ── 对话与模型 ───────────────────────────── */
+{n:"ChatGPT",u:"https://chatgpt.com",d:"OpenAI 旗舰对话产品",c:"chat",hot:1},
+{n:"Claude",u:"https://claude.ai",d:"Anthropic 对话产品，长文与代码强",c:"chat",hot:1},
+{n:"Gemini",u:"https://gemini.google.com",d:"Google 多模态助手",c:"chat"},
+{n:"Grok",u:"https://grok.com",d:"xAI 对话产品，接实时信息",c:"chat"},
+{n:"Perplexity",u:"https://www.perplexity.ai",d:"带引用的 AI 搜索",c:"chat"},
+{n:"Mistral",u:"https://mistral.ai",d:"法国开源模型厂商",c:"chat"},
+{n:"Meta AI",u:"https://www.meta.ai",d:"Meta 的通用助手入口",c:"chat"},
+{n:"Microsoft Copilot",u:"https://copilot.microsoft.com",d:"微软全线产品内的助手",c:"chat"},
+
+/* ── AI 编程 ─────────────────────────────── */
+{n:"Claude Code",u:"https://claude.com/product/claude-code",d:"终端内的编码 agent，长任务见长",c:"code",hot:1},
+{n:"Codex",u:"https://openai.com/codex",d:"OpenAI 编码 agent，含 CLI 与云端",c:"code",hot:1},
+{n:"Cursor",u:"https://cursor.com",d:"AI 优先的代码编辑器",c:"code",hot:1},
+{n:"GitHub Copilot",u:"https://github.com/features/copilot",d:"老牌代码补全与 agent 模式",c:"code"},
+{n:"Cline",u:"https://cline.bot",d:"开源 VS Code 编码 agent",c:"code"},
+{n:"Windsurf",u:"https://windsurf.com",d:"Agent 式 IDE",c:"code"},
+{n:"opencode",u:"https://opencode.ai",d:"开源终端编码 agent",c:"code"},
+{n:"Aider",u:"https://aider.chat",d:"终端里的结对编程工具",c:"code"},
+{n:"Devin",u:"https://devin.ai",d:"自主软件工程 agent",c:"code"},
+{n:"v0",u:"https://v0.dev",d:"用自然语言生成前端界面",c:"code"},
+{n:"Bolt",u:"https://bolt.new",d:"浏览器内生成并部署全栈应用",c:"code"},
+{n:"Lovable",u:"https://lovable.dev",d:"对话式全栈应用生成",c:"code"},
+{n:"Replit",u:"https://replit.com",d:"云端 IDE，内置 agent",c:"code"},
+
+/* ── 图像生成 ────────────────────────────── */
+{n:"Midjourney",u:"https://midjourney.com",d:"美学风格突出的文生图",c:"image"},
+{n:"Ideogram",u:"https://ideogram.ai",d:"图中文字渲染能力强",c:"image"},
+{n:"Krea",u:"https://www.krea.ai",d:"实时生成与增强画布",c:"image"},
+{n:"Recraft",u:"https://recraft.ai",d:"面向设计的生成与矢量图",c:"image"},
+{n:"Civitai",u:"https://civitai.com",d:"开源图像模型与 LoRA 社区",c:"image"},
+{n:"即梦",u:"https://jimeng.jianying.com",d:"字节的图/视频生成平台",c:"image"},
+{n:"Unlimited OCR",u:"https://github.com/baidu/Unlimited-OCR",d:"一次性长文档解析的新方案",c:"image"},
+
+/* ── 视频生成 ────────────────────────────── */
+{n:"Sora",u:"https://sora.chatgpt.com",d:"OpenAI 视频生成",c:"video",hot:1},
+{n:"Runway",u:"https://runwayml.com",d:"专业视频生成与编辑套件",c:"video"},
+{n:"可灵 Kling",u:"https://klingai.com",d:"快手视频生成，支持多镜头",c:"video",hot:1},
+{n:"Vidu",u:"https://www.viduglobal.com",d:"实时可交互视频生成",c:"video"},
+{n:"Luma",u:"https://lumalabs.ai",d:"Dream Machine 视频生成",c:"video"},
+{n:"HeyGen",u:"https://heygen.com",d:"数字人与多语言口型",c:"video"},
+{n:"Hailuo 海螺",u:"https://www.hailuo.ai",d:"MiniMax 视频生成",c:"video"},
+{n:"fal",u:"https://fal.ai",d:"生成式媒体模型推理平台",c:"video"},
+{n:"beeble",u:"https://beeble.ai",d:"视频换背景与光效（SwitchX）",c:"video"},
+
+/* ── 音频与音乐 ──────────────────────────── */
+{n:"Suno",u:"https://suno.com",d:"文字生成整首歌",c:"audio"},
+{n:"ElevenLabs",u:"https://elevenlabs.io",d:"语音合成与配音",c:"audio",hot:1},
+{n:"Fish Audio",u:"https://fish.audio",d:"开源语音合成与克隆",c:"audio"},
+
+/* ── Agent 与开发 ────────────────────────── */
+{n:"OpenAI Agents API",u:"https://developers.openai.com/api/docs/guides/agents-api/overview",d:"官方 agent 编排接口",c:"agent",hot:1},
+{n:"Model Context Protocol",u:"https://modelcontextprotocol.io",d:"工具接入的事实标准协议",c:"agent",hot:1},
+{n:"Dify",u:"https://dify.ai",d:"开源 LLM 应用编排平台",c:"agent"},
+{n:"n8n",u:"https://n8n.io",d:"工作流自动化，AI 节点丰富",c:"agent"},
+{n:"n8n 工作流库",u:"https://n8n.io/workflows",d:"可直接导入的自动化模板",c:"agent"},
+{n:"LangChain",u:"https://langchain.com",d:"老牌 LLM 应用框架",c:"agent"},
+{n:"LangGraph",u:"https://langgraph.com",d:"有状态多 agent 编排",c:"agent"},
+{n:"CrewAI",u:"https://www.crewai.com",d:"多 agent 协作框架",c:"agent"},
+{n:"AutoGen",u:"https://microsoft.github.io/autogen",d:"微软多 agent 对话框架",c:"agent"},
+{n:"E2B",u:"https://e2b.dev",d:"Agent 代码执行沙箱",c:"agent"},
+{n:"Daytona",u:"https://www.daytona.io",d:"安全可丢弃的执行环境",c:"agent"},
+{n:"MCP 服务器目录",u:"https://mcp.so",d:"社区 MCP server 集合",c:"agent"},
+{n:"Smithery",u:"https://smithery.ai",d:"MCP server 市场与一键安装",c:"agent"},
+
+/* ── 检索与研究 ──────────────────────────── */
+{n:"NotebookLM",u:"https://notebooklm.google.com",d:"基于你的资料做问答与播客",c:"research"},
+{n:"Elicit",u:"https://elicit.com",d:"文献综述与证据抽取",c:"research"},
+{n:"Consensus",u:"https://consensus.app",d:"从论文里找结论",c:"research"},
+{n:"SciSpace",u:"https://scispace.com",d:"论文阅读与解释助手",c:"research"},
+
+/* ── 学术与论文 ──────────────────────────── */
+{n:"arXiv",u:"https://arxiv.org",d:"预印本主战场",c:"paper",hot:1},
+{n:"Semantic Scholar",u:"https://www.semanticscholar.org",d:"带引文网络的论文检索",c:"paper"},
+{n:"OpenReview",u:"https://openreview.net",d:"会议评审公开记录",c:"paper"},
+{n:"Connected Papers",u:"https://www.connectedpapers.com",d:"用图谱找相关论文",c:"paper"},
+{n:"alphaXiv",u:"https://www.alphaxiv.org",d:"arXiv 论文的讨论与解读",c:"paper"},
+
+/* ── 榜单与基准 ──────────────────────────── */
+{n:"LMArena",u:"https://lmarena.ai",d:"人类盲测偏好榜",c:"rank",hot:1},
+{n:"Artificial Analysis",u:"https://artificialanalysis.ai",d:"智能/速度/价格三维对比",c:"rank",hot:1},
+{n:"SWE-bench",u:"https://www.swebench.com",d:"真实软件工程任务基准",c:"rank"},
+{n:"METR 时间视界",u:"https://metr.org/time-horizons/",d:"长任务能撑多久的权威度量",c:"rank",hot:1},
+{n:"LiveBench",u:"https://livebench.ai",d:"抗污染的持续更新基准",c:"rank"},
+{n:"Aider 排行",u:"https://aider.chat/docs/leaderboards",d:"编码能力与成本比",c:"rank"},
+
+/* ── 资讯与热点 ──────────────────────────── */
+{n:"机器之心",u:"https://www.jiqizhixin.com",d:"中文 AI 行业媒体",c:"news"},
+{n:"量子位",u:"https://www.qbitai.com",d:"中文 AI 资讯",c:"news"},
+{n:"OpenAI News",u:"https://openai.com/news",d:"官方发布与公告",c:"news"},
+{n:"Anthropic News",u:"https://www.anthropic.com/news",d:"官方发布",c:"news"},
+{n:"Anthropic Engineering",u:"https://www.anthropic.com/engineering",d:"工程博客，harness/上下文干货",c:"news",hot:1},
+{n:"Google DeepMind Blog",u:"https://deepmind.google/discover/blog",d:"DeepMind 研究博客",c:"news"},
+{n:"Hacker News",u:"https://news.ycombinator.com",d:"技术圈第一现场",c:"news"},
+{n:"Simon Willison",u:"https://simonwillison.net",d:"LLM 领域最勤的独立观察者",c:"news"},
+{n:"Latent Space",u:"https://www.latent.space",d:"AI 工程师播客与通讯",c:"news"},
+{n:"TLDR AI",u:"https://tldr.tech/ai",d:"每日 AI 摘要邮件",c:"news"},
+{n:"Ben's Bites",u:"https://www.bensbites.com",d:"AI 产品向日报",c:"news"},
+
+/* ── 工具与资源 ──────────────────────────── */
+{n:"HuggingFace",u:"https://huggingface.co",d:"模型、数据集、Demo 大本营",c:"tool",hot:1},
+{n:"HuggingFace Spaces",u:"https://huggingface.co/spaces",d:"在线试用模型 Demo",c:"tool"},
+{n:"OpenRouter",u:"https://openrouter.ai",d:"一个 key 调用多家模型",c:"tool"},
+{n:"Replicate",u:"https://replicate.com",d:"按次调用的模型 API",c:"tool"},
+{n:"Groq",u:"https://groq.com",d:"超低延迟推理",c:"tool"},
+{n:"Ollama",u:"https://ollama.com",d:"本地跑开源模型",c:"tool"},
+{n:"LM Studio",u:"https://lmstudio.ai",d:"桌面端本地模型工具",c:"tool"},
+{n:"Jan",u:"https://jan.ai",d:"开源本地 AI 客户端",c:"tool"},
+{n:"Cursor Directory",u:"https://cursor.directory",d:"Cursor 规则与配置共享",c:"tool"},
+
+/* ── 国内与中文 ──────────────────────────── */
+{n:"DeepSeek",u:"https://chat.deepseek.com",d:"国产开源模型代表",c:"local",hot:1},
+{n:"通义千问 Qwen",u:"https://chat.qwen.ai",d:"阿里大模型，开源生态活跃",c:"local",hot:1},
+{n:"Kimi",u:"https://www.kimi.com",d:"月之暗面，长文本见长",c:"local"},
+{n:"智谱 ChatGLM",u:"https://chatglm.cn",d:"清华系大模型",c:"local"},
+{n:"Z.ai",u:"https://chat.z.ai",d:"GLM 海外入口",c:"local"},
+{n:"豆包",u:"https://www.doubao.com",d:"字节对话产品",c:"local"},
+{n:"腾讯元宝",u:"https://yuanbao.tencent.com",d:"腾讯对话助手",c:"local"},
+{n:"MiniMax",u:"https://www.minimaxi.com",d:"海螺系列模型",c:"local"},
+{n:"ModelScope 魔搭",u:"https://www.modelscope.cn",d:"国内模型与数据集社区",c:"local"},
+{n:"硅基流动",u:"https://siliconflow.cn",d:"国内模型推理 API",c:"local"},
+{n:"扣子 Coze",u:"https://www.coze.cn",d:"零代码 Bot 搭建",c:"local"},
+{n:"知乎",u:"https://www.zhihu.com",d:"中文技术讨论区",c:"local"},
+
+/* ── 同类导航 ────────────────────────────── */
+{n:"AIHOT",u:"https://aihot.news/all",d:"热点监控 + 重置追踪（参考对象）",c:"nav",hot:1},
+{n:"365AI 导航",u:"https://365dh.cn",d:"500+ 工具，含站长点评",c:"nav"},
+{n:"AI 导航台",u:"https://nav-ai.cn",d:"精选 AI 工具目录",c:"nav"},
+{n:"AI 聚途",u:"https://aijutu.com",d:"工具与资讯聚合",c:"nav"},
+{n:"ZhiNav",u:"https://zhinav.com",d:"智能导航入口",c:"nav"},
+{n:"AI 全站导航",u:"https://ainall.cc",d:"4600+ 工具，33 分类",c:"nav"},
+{n:"AI Stack Nav",u:"https://aistacknav.com",d:"工具榜单与目录汇总",c:"nav"}
+];
+
+/* ── 渲染 ─────────────────────────────── */
+const HUES=["#2563eb","#7c3aed","#db2777","#ea580c","#0891b2","#059669","#ca8a04","#dc2626","#4f46e5","#0d9488"];
+const catMap=Object.fromEntries(CATS.map(c=>[c[0],{label:c[1],hint:c[2],color:c[3]}]));
+const out=document.getElementById("out"), catsEl=document.getElementById("cats"), qEl=document.getElementById("q");
+let cur="all";
+
+function avatar(name){
+  let h=0; for(const ch of name) h=(h*31+ch.codePointAt(0))>>>0;
+  const bg=HUES[h%HUES.length];
+  const first=/[a-zA-Z]/.test(name[0])?name[0].toUpperCase():name[0];
+  return `<span class="av" style="background:${bg}">${first}</span>`;
+}
+function tagOf(s){
+  if(s.c==="signal") return '<span class="tagline sig">信号</span>';
+  if(s.hot) return '<span class="tagline hot">热门</span>';
+  if(s.c==="nav") return '<span class="tagline nav">参考</span>';
+  return '';
+}
+function card(s){
+  const host=s.u.replace(/^https?:\/\//,"").split("/")[0];
+  return `<a class="card${s.c==="signal"?" is-signal":""}" href="${s.u}" target="_blank" rel="noopener">
+    ${avatar(s.n)}
+    <span class="meta">
+      <span class="nm"><b>${s.n}</b>${tagOf(s)}</span>
+      <span class="du">${s.d}<br>${host}</span>
+    </span>
+    <span class="cp" data-u="${s.u}" title="复制链接">复制</span>
+  </a>`;
+}
+function counts(){
+  const m={}; SITES.forEach(s=>m[s.c]=(m[s.c]||0)+1); return m;
+}
+function renderCats(){
+  const n=counts();
+  catsEl.innerHTML=[`<button class="chip ${cur==="all"?"on":""}" data-c="all">全部 ${SITES.length}</button>`]
+    .concat(CATS.map(c=>`<button class="chip ${c[0]==="signal"?"hot ":""}${cur===c[0]?"on":""}" data-c="${c[0]}">${c[1]} ${n[c[0]]||0}</button>`)).join("");
+}
+function render(){
+  const kw=qEl.value.trim().toLowerCase();
+  let list=SITES.filter(s=>cur==="all"||s.c===cur);
+  if(kw) list=list.filter(s=>(s.n+s.d+s.u+s.c).toLowerCase().includes(kw));
+  if(!list.length){ out.innerHTML=`<div class="empty">没有匹配的站点　·　试试「重置」「视频」「榜单」</div>`; return; }
+  if(kw||cur!=="all"){
+    out.innerHTML=`<div class="sect"><h2>${kw?"搜索结果":"分类"}</h2><span>${list.length} 个</span></div><div class="grid">${list.map(card).join("")}</div>`;
+    return;
+  }
+  // all：按分类分组，信号置顶
+  out.innerHTML=CATS.map(c=>{
+    const g=SITES.filter(s=>s.c===c[0]); if(!g.length) return "";
+    const block=`<div class="sect ${c[0]==="signal"?"signal":""}"><h2>${c[1]}</h2><span>${c[2]}　·　${g.length} 个</span></div>
+      <div class="grid">${g.map(card).join("")}</div>`;
+    return block;
+  }).join("");
+}
+catsEl.addEventListener("click",e=>{
+  const b=e.target.closest(".chip"); if(!b) return;
+  cur=b.dataset.c; renderCats(); render(); window.scrollTo({top:0,behavior:"smooth"});
+});
+qEl.addEventListener("input",render);
+document.addEventListener("keydown",e=>{
+  if(e.key==="/"&&document.activeElement!==qEl){e.preventDefault();qEl.focus();}
+  if(e.key==="Escape"&&document.activeElement===qEl){qEl.value="";render();qEl.blur();}
+});
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".cp"); if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  navigator.clipboard.writeText(b.dataset.u).then(()=>toast("已复制链接"));
+});
+let tt;
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),1400);
+}
+document.getElementById("total").textContent=SITES.length;
+document.getElementById("count").textContent=`共 ${SITES.length} 个站点，${CATS.length} 个分类　·　信号区追踪额度重置、模型发布、榜单价格，其余为精选工具与资源`;
+renderCats(); render();
+</script>
+</body>
+</html>
