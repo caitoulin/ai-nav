@@ -98,6 +98,7 @@
 
 <footer class="wrap">
   <span>收录 <b id="total"></b> 个站点 · 全部链接经连通性核验</span>
+  <span><b>收录标准</b>（承 free-for.dev）：真免费档而非试用 · 额度写清 · 价格公开 · 至少可用一年 · 不收套壳与无新价值的复制品</span>
   <span>静态站点，无追踪 · 点击卡片右上「复制」可拷贝链接</span>
 </footer>
 <div class="toast" id="toast"></div>
@@ -105,6 +106,7 @@
 <script>
 const CATS = [
   ["signal","状态与信号","实时追踪：额度重置 / 模型发布 / 服务状态","#0d9488"],
+  ["free","AI 免费额度","真免费档（非试用）· 额度写清 · 至少可用一年","#16a34a"],
   ["chat","对话与模型","通用大模型与对话产品","#2563eb"],
   ["code","AI 编程","编码助手、IDE 与代码生成","#7c3aed"],
   ["image","图像生成","文生图、改图、设计稿","#db2777"],
@@ -134,6 +136,32 @@ const SITES = [
 {n:"HuggingFace 趋势",u:"https://huggingface.co/models",d:"模型下载与热度榜",c:"signal"},
 {n:"HuggingFace 论文",u:"https://huggingface.co/papers",d:"每日热门论文榜",c:"signal",hot:1},
 {n:"GitHub Trending",u:"https://github.com/trending",d:"今日热门仓库，AI 项目常驻",c:"signal"},
+
+/* ── AI 免费额度 ─────────────────────────── */
+{n:"free-for.dev",u:"https://github.com/ripienaar/free-for-dev",d:"源头清单：57 类 1200+ 免费服务，收录标准极严",c:"free",hot:1},
+{n:"Langfuse",u:"https://langfuse.com",d:"LLM 可观测性，5 万条观测/月永久免费，开源",c:"free",hot:1},
+{n:"Keywords AI",u:"https://keywordsai.co",d:"LLM 监控网关，每月 1 万次请求",c:"free"},
+{n:"Portkey",u:"https://portkey.ai",d:"AI 网关 + 可观测性，每月 1 万次请求",c:"free"},
+{n:"Braintrust",u:"https://www.braintrustdata.com",d:"Eval 与提示词工作台，每周 1000 条私有 eval",c:"free"},
+{n:"Arize AX",u:"https://arize.com",d:"AI 观测与评估，2.5 万 span + 1GB 摄取/月",c:"free"},
+{n:"Latitude",u:"https://latitude.so",d:"开源 LLM 观测，2 万 credits/月，留 30 天",c:"free"},
+{n:"LangWatch",u:"https://langwatch.ai",d:"LLMOps 平台，1000 trace/月 + DSPy 优化器",c:"free"},
+{n:"Maxim",u:"https://www.getmaxim.ai",d:"Agent 评估与模拟，每月 1 万条日志",c:"free"},
+{n:"telemetry.dev",u:"https://telemetry.dev",d:"OpenTelemetry 的 LLM 观测，1 万 span/月",c:"free"},
+{n:"Future AGI",u:"https://futureagi.com",d:"开源 LLM 评测，50GB 存储 + 10 万网关请求/月",c:"free"},
+{n:"Gonka Broker",u:"https://gonkabroker.com",d:"兼容 OpenAI 的开源模型 API，每月 100 万+ 免费 token",c:"free",hot:1},
+{n:"OpenRouter 免费模型",u:"https://openrouter.ai/models?q=free",d:"DeepSeek / Llama 等免费档，有限流",c:"free"},
+{n:"Pollinations.AI",u:"https://pollinations.ai",d:"免注册免 Key 的图像生成 API",c:"free"},
+{n:"Firecrawl",u:"https://www.firecrawl.dev",d:"网页转 LLM 友好 markdown，每月 1000 credits",c:"free"},
+{n:"Comet Opik",u:"https://www.comet.com/site/products/opik/",d:"开源 LLM 评测与追踪",c:"free"},
+{n:"Kaggle",u:"https://www.kaggle.com",d:"免费 Notebook + 每周 30 小时 GPU / 20 小时 TPU",c:"free",hot:1},
+{n:"Google Colab",u:"https://colab.research.google.com",d:"免费 GPU Notebook 环境",c:"free"},
+{n:"Qdrant",u:"https://qdrant.tech",d:"向量库免费档：0.5 vCPU / 1GB 内存 / 4GB 磁盘",c:"free"},
+{n:"Turso",u:"https://turso.tech",d:"边缘 SQLite：9GB 存储 + 每月 10 亿行读",c:"free"},
+{n:"Upstash",u:"https://upstash.com",d:"Serverless Redis：每月 50 万命令，256MB",c:"free"},
+{n:"Neo4j Aura",u:"https://neo4j.com/cloud/aura/",d:"图数据库免费档：20 万节点 / 40 万关系",c:"free"},
+{n:"Composio",u:"https://composio.dev",d:"Agent 工具集成平台，200+ 工具接入",c:"free"},
+{n:"Zenable",u:"https://zenable.io",d:"MCP 守卫：每天 100 次工具调用 + 25 次 PR 审查",c:"free"},
 
 /* ── 对话与模型 ───────────────────────────── */
 {n:"ChatGPT",u:"https://chatgpt.com",d:"OpenAI 旗舰对话产品",c:"chat",hot:1},
@@ -244,6 +272,12 @@ const SITES = [
 {n:"LM Studio",u:"https://lmstudio.ai",d:"桌面端本地模型工具",c:"tool"},
 {n:"Jan",u:"https://jan.ai",d:"开源本地 AI 客户端",c:"tool"},
 {n:"Cursor Directory",u:"https://cursor.directory",d:"Cursor 规则与配置共享",c:"tool"},
+{n:"DigitalPlat",u:"https://domain.digitalplat.org",d:"免费子域名注册",c:"tool"},
+{n:"DNSHE",u:"https://www.dnshe.com",d:"免费子域名，支持自定义 NS",c:"tool"},
+{n:"pp.ua",u:"https://nic.ua",d:"免费 pp.ua 子域名",c:"tool"},
+{n:"isroot.in",u:"https://isroot.in",d:"免费 isroot.in 子域名",c:"tool"},
+{n:"deSEC",u:"https://desec.io",d:"免费 DNS 托管，支持 API 与 DNSSEC",c:"tool"},
+{n:"ClouDNS",u:"https://www.cloudns.net",d:"免费 DNS 托管，1 域名 50 条记录",c:"tool"},
 
 /* ── 国内与中文 ──────────────────────────── */
 {n:"DeepSeek",u:"https://chat.deepseek.com",d:"国产开源模型代表",c:"local",hot:1},
@@ -343,7 +377,7 @@ function toast(msg){
   clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("on"),1400);
 }
 document.getElementById("total").textContent=SITES.length;
-document.getElementById("count").textContent=`共 ${SITES.length} 个站点，${CATS.length} 个分类　·　信号区追踪额度重置、模型发布、榜单价格，其余为精选工具与资源`;
+document.getElementById("count").textContent=`共 ${SITES.length} 个站点，${CATS.length} 个分类　·　信号区追踪额度重置与模型发布，免费额度区只收真免费档（含具体额度）`;
 renderCats(); render();
 </script>
 </body>
