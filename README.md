@@ -63,12 +63,18 @@ gh api -X PUT repos/OWNER/REPO/contents/index.html \
 脚本会：写 `CNAME` → 设置 Pages 自定义域名 → 开启强制 HTTPS → 轮询域名校验 → 打印需要添加的 DNS 记录。
 （走 REST API，因为本机 `git push` 被拦。）
 
-手动操作步骤：1. 在注册商购买域名（候选见下）
-2. 在仓库 Settings → Pages → Custom domain 填入域名，或在项目根加 `CNAME` 文件（内容为裸域名）
-3. DNS 配置：
-   - 根域：4 条 A 记录 → `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
-   - 子域：CNAME → `caitoulin.github.io`
-4. 勾选 Enforce HTTPS（证书自动签发，约 10 分钟）
+手动操作步骤：
+
+**1.** 在注册商购买域名（候选见下）
+
+**2.** 在仓库 Settings → Pages → Custom domain 填入域名，或在项目根加 `CNAME` 文件（内容为裸域名）
+
+**3.** DNS 配置：
+
+- 根域：4 条 A 记录 → `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
+- 子域：CNAME → `caitoulin.github.io`
+
+**4.** 勾选 Enforce HTTPS（证书自动签发，约 10 分钟）
 
 ### 候选域名（RDAP 实查，2026-09-15）
 
