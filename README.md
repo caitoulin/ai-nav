@@ -53,7 +53,17 @@ gh api -X PUT repos/OWNER/REPO/contents/index.html \
 
 ## 绑定自有域名
 
-1. 在注册商购买域名（候选见下）
+**一条命令搞定**（脚本已随仓库提供）：
+
+```bash
+./bind-domain.sh <你的域名>          # 绑定并轮询校验状态
+./bind-domain.sh <你的域名> --check  # 只看当前绑定状态，不做改动
+```
+
+脚本会：写 `CNAME` → 设置 Pages 自定义域名 → 开启强制 HTTPS → 轮询域名校验 → 打印需要添加的 DNS 记录。
+（走 REST API，因为本机 `git push` 被拦。）
+
+手动操作步骤：1. 在注册商购买域名（候选见下）
 2. 在仓库 Settings → Pages → Custom domain 填入域名，或在项目根加 `CNAME` 文件（内容为裸域名）
 3. DNS 配置：
    - 根域：4 条 A 记录 → `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`
